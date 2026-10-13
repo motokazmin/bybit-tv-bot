@@ -1,0 +1,46 @@
+# Скопируйте этот файл в config.yaml и заполните.
+
+# demo — демо-счёт Bybit (виртуальные деньги), live — реальный счёт.
+mode: demo
+
+# Режим маржи для всего аккаунта: isolated | cross
+margin_mode: isolated
+
+bybit:
+  # Ключ создаётся в Bybit → API. Для demo — ключ, созданный в режиме Demo Trading.
+  # Права: Contracts → Orders + Positions. Вывод средств (Withdraw) НЕ включать.
+  api_key: "ВАШ_API_KEY"
+  api_secret: "ВАШ_API_SECRET"
+
+webhook:
+  # Длинная случайная строка от 8 символов: латиница, цифры, знаки, без пробелов (например, вывод `openssl rand -hex 24`). Та же строка указывается в алерте TradingView.
+  secret: "придумайте-длинный-секрет"
+  port: 8000
+
+# Настройки по умолчанию для всех пар.
+defaults:
+  leverage: 5               # плечо
+  size:
+    # margin_usdt   — маржа в USDT (объём позиции = маржа × плечо)
+    # notional_usdt — объём позиции в USDT
+    # balance_pct   — % от доступного баланса как маржа
+    # qty           — фиксированное количество монет
+    mode: margin_usdt
+    value: 20
+  take_profit_pct: null     # тейк-профит в % от цены входа, null — без TP
+  stop_loss_pct: null       # стоп-лосс в % от цены входа, null — без SL
+  # Что делать, если пришёл сигнал против открытой позиции:
+  # reverse — закрыть и открыть противоположную, close — только закрыть, ignore — ничего
+  on_opposite: reverse
+
+# Разрешённые пары. Сигналы по другим парам игнорируются.
+# Для пары можно переопределить любую настройку из defaults.
+symbols:
+  BTCUSDT:
+  ETHUSDT:
+    leverage: 10
+    size:
+      mode: balance_pct
+      value: 5
+    take_profit_pct: 3
+    stop_loss_pct: 1.5

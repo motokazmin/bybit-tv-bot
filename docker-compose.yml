@@ -1,0 +1,23 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    ports:
+      - "8000:8000"
+
+  # Бесплатный публичный HTTPS-адрес для TradingView без VPS и домена (localhost.run, обычный SSH).
+  # Адрес появляется в логах: docker compose logs tunnel | grep lhr.life
+  # Меняется при каждом перезапуске туннеля.
+  tunnel:
+    build:
+      dockerfile_inline: |
+        FROM alpine:3.20
+        RUN apk add --no-cache openssh-client
+    restart: unless-stopped
+    command: >
+      ssh -T -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes
+      -R 80:bot:8000 nokey@localhost.run
+    depends_on:
+      - bot
